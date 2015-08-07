@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+X-Nemo-Application-Type=silica-qt5
+Icon=harbour-python3ftp
+Exec=harbour-python3ftp
+Name=Python FTP
+
