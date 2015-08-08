@@ -41,6 +41,8 @@ import mimetypes
 import re
 import time
 import pyotherside
+import socket
+import random
 
 try:
     from io import StringIO
@@ -88,6 +90,27 @@ class GetWanIp:
         if url == opener.geturl():
             str = opener.read()
         return re.search('(\d+\.){3}\d+',str).group(0)
+def scan(port):
+    sk = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sk.settimeout(3)
+    flag=False
+    try:
+        sk.connect(('127.0.0.1',port))
+        flag=True
+    except Exception:
+        flag=False
+    sk.close()
+    return flag
+
+#随机端口号
+def randomport():
+    port=9537
+    pflag = scan(port)
+    #如果端口开启,则更换随机端口
+    while (pflag):
+        port = random.randint(9000,50000)
+        pflag = scan(port)
+    return port
 
 def showTips():
     pyotherside.send("")
@@ -100,7 +123,7 @@ def showTips():
     #     pyotherside.send('-------->> if you want to use other port, please execute: ')
     #     pyotherside.send('-------->> python SimpleHTTPServerWithUpload.py port ')
     #     pyotherside.send("-------->> port is a integer and it's range: 1024 < port < 65535 ")
-    port = 9537
+    port = randomport()
 
     if not 1024 < port < 65535:  port = 9898
     # serveraddr = ('', port)
