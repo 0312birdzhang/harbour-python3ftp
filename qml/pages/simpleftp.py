@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # modifyDate: 20120808 ~ 20120810
 # 原作者为：bones7456, http://li2z.cn/
 # 修改者为：decli@qq.com
@@ -8,14 +9,6 @@
 # -: 一些路径显示的bug，主要是 cgi.escape() 转义问题
 # ?: notepad++ 下直接编译的server路径问题
 
-"""
-    简介：这是一个 python 写的轻量级的文件共享服务器（基于内置的SimpleHTTPServer模块），
-    支持文件上传下载，只要你安装了python（建议版本2.6~2.7，不支持3.x），
-    然后去到想要共享的目录下，执行：
-        python SimpleHTTPServerWithUpload.py 1234
-    其中1234为你指定的端口号，如不写，默认为 8080
-    然后访问 http://localhost:1234 即可，localhost 或者 1234 请酌情替换。
-"""
 
 """Simple HTTP Server With Upload.
 
@@ -205,8 +198,7 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             f.write("<strong>Failed:</strong>")
         f.write(info)
         f.write("<br><a href=\"%s\">back</a>" % self.headers['referer'])
-        f.write("<hr><small>Powered By: bones7456, check new version at ")
-        f.write("<a href=\"http://li2z.cn/?s=SimpleHTTPServerWithUpload\">")
+        f.write("<hr><small>Powered By: bones7456, Ported By:0312birdzhang ")
         f.write("here</a>.</small></body>\n</html>\n")
         length = f.tell()
         f.seek(0)
@@ -338,8 +330,10 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         f.write("<form ENCTYPE=\"multipart/form-data\" method=\"post\">")
         f.write("<input name=\"file\" type=\"file\"/>")
         f.write("<input type=\"submit\" value=\"upload\"/>")
-        f.write("&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp")
-        f.write("<input type=\"button\" value=\"HomePage\" onClick=\"location='/'\">")
+        f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+        f.write("<input type=\"button\" value=\"HomePage\" onClick=\"location='/'\"/>")
+        f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+        f.write("<input type=\"button\" value=\"PreviousPage\" onClick=\"javascript:window.history.go(-1)\"/>")
         f.write("</form>\n")
         f.write("<hr>\n<ul>\n")
         for name in list:
