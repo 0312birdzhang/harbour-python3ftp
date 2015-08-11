@@ -8,8 +8,10 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
-* Sun Apr 13 2014 Jack Tar <jack.tar@example.com> 0.0.1-1
-- Scrubbed the deck
-- Hoisted the sails
+* Fri Aug 7 2015 BirdZhang <0312birdzhang@gmail.com> 0.0.2-1
+ -add random port if 9537 is used
+
+* Fri Aug 7 2015 BirdZhang <0312birdzhang@gmail.com> 0.0.1-1
+ -update icon
 
 

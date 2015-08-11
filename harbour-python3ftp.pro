@@ -19,12 +19,12 @@ SOURCES += src/harbour-python3ftp.cpp
 OTHER_FILES += qml/harbour-python3ftp.qml \
     qml/cover/CoverPage.qml \
     qml/pages/FirstPage.qml \
-    rpm/harbour-python3ftp.changes.in \
     rpm/harbour-python3ftp.spec \
     rpm/harbour-python3ftp.yaml \
     translations/*.ts \
     qml/pages/simpleftp.py \
-    harbour-python3ftp.desktop
+    harbour-python3ftp.desktop \
+    rpm/harbour-python3ftp.changes
 
 # to disable building translations every time, comment out the
 # following CONFIG line
