@@ -41,6 +41,8 @@ import mimetypes
 import re
 import time
 import pyotherside
+import socket
+import random
 
 try:
     from io import StringIO
@@ -88,6 +90,27 @@ class GetWanIp:
         if url == opener.geturl():
             str = opener.read()
         return re.search('(\d+\.){3}\d+',str).group(0)
+def scan(port):
+    sk = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sk.settimeout(3)
+    flag=False
+    try:
+        sk.connect(('127.0.0.1',port))
+        flag=True
+    except Exception:
+        flag=False
+    sk.close()
+    return flag
+
+#随机端口号
+def randomport():
+    port=9537
+    pflag = scan(port)
+    #如果端口开启,则更换随机端口
+    while (pflag):
+        port = random.randint(9000,50000)
+        pflag = scan(port)
+    return port
 
 def showTips():
     pyotherside.send("")
@@ -100,7 +123,7 @@ def showTips():
     #     pyotherside.send('-------->> if you want to use other port, please execute: ')
     #     pyotherside.send('-------->> python SimpleHTTPServerWithUpload.py port ')
     #     pyotherside.send("-------->> port is a integer and it's range: 1024 < port < 65535 ")
-    port = 9537
+    port = randomport()
 
     if not 1024 < port < 65535:  port = 9898
     # serveraddr = ('', port)
@@ -155,7 +178,7 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         if f:
             for i in f.readlines():
                 if isinstance(i,str):
-                    self.wfile.write(i.encode("utf-8"))
+                    self.wfile.write(i.encode("utf-8", 'surrogateescape'))
                 else:
                     self.wfile.write(i)
             #self.copyfile(f, self.wfile)
@@ -207,13 +230,13 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         line = self.rfile.readline()
         remainbytes -= len(line)
         fn = re.findall(r'Content-Disposition.*name="file"; filename="(.*)"'.encode('utf-8'), line)
-        if not fn:
+        if not fn or len(fn) == 0:
             return (False, "Can't find out file name...")
         path = str(self.translate_path(self.path)).encode('utf-8')
         osType = platform.system()
         try:
             if osType == "Linux":
-                fn = os.path.join(path, fn[0].decode('gbk').encode('utf-8'))
+                fn = os.path.join(path, fn[0])
             else:
                 fn = os.path.join(path, fn[0])
         except Exception as e:
@@ -278,12 +301,14 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             # Always read in binary mode. Opening files in text mode may cause
             # newline translations, making the actual size of the content
             # transmitted *less* than the content-length!
+            #f = open(path, 'rb')
             f = open(path, 'rb')
         except IOError:
             self.send_error(404, "File not found")
             return None
         self.send_response(200)
-        self.send_header("Content-type", ctype)
+        #self.send_header("Content-type", ctype)
+        self.send_header("Content-type", ctype+';charset = utf-8')
         fs = os.fstat(f.fileno())
         self.send_header("Content-Length", str(fs[6]))
         self.send_header("Last-Modified", self.date_time_string(fs.st_mtime))
@@ -307,7 +332,7 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         f = StringIO()
         displaypath = cgi.escape(urllib.parse.unquote(self.path))
         f.write('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">')
-        f.write("<html>\n<title>Directory listing for %s</title>\n" % displaypath)
+        f.write("<html>\n<head>\n <meta charset=\"UTF-8\"> \n<title>Directory listing for %s</title>\n</head>" % displaypath)
         f.write("<body>\n<h2>Directory listing for %s</h2>\n" % displaypath)
         f.write("<hr>\n")
         f.write("<form ENCTYPE=\"multipart/form-data\" method=\"post\">")
@@ -327,9 +352,10 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
                 linkname = name + "/"
             if os.path.islink(fullname):
                 colorName = '<span style="background-color: #FFBFFF;">' + name + '@</span>'
-                displayname = name
+            linkname = linkname.encode('utf-8', 'surrogateescape')#.decode('ISO-8859-1')
                 # Note: a link to a directory displays with @ and links with /
             filename = os.getcwd() + '/' + displaypath + displayname
+            filename = filename.encode('utf-8', 'surrogateescape')#.decode('ISO-8859-1')
             f.write('<table><tr><td width="60%%"><a href="%s">%s</a></td><td width="20%%">%s</td><td width="20%%">%s</td></tr>\n'
                     % (urllib.parse.quote(linkname), colorName,
                         sizeof_fmt(os.path.getsize(filename)), modification_date(filename)))
@@ -337,7 +363,7 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         length = f.tell()
         f.seek(0)
         self.send_response(200)
-        self.send_header("Content-type", "text/html")
+        self.send_header("Content-type", "text/html;charset=utf-8")
         self.send_header("Content-Length", str(length))
         self.end_headers()
         return f
