@@ -222,7 +222,7 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         line = self.rfile.readline()
         remainbytes -= len(line)
         fn = re.findall(r'Content-Disposition.*name="file"; filename="(.*)"'.encode('utf-8'), line)
-        if not fn or len(fn) == 0:
+        if not fn or len(fn[0]) == 0:
             return (False, "Can't find out file name...")
         path = str(self.translate_path(self.path)).encode('utf-8')
         osType = platform.system()
@@ -232,7 +232,7 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             else:
                 fn = os.path.join(path, fn[0])
         except Exception as e:
-            return (False, "文件名请不要用中文，或者使用IE上传中文名的文件。{}" .format(e))
+            return (False, "Wrong File name charactor {}" .format(e))
         while os.path.exists(fn):
             fn += "_".encode("utf-8")
         line = self.rfile.readline()
@@ -331,7 +331,11 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         f.write("<input name=\"file\" type=\"file\"/>")
         f.write("<input type=\"submit\" value=\"upload\"/>")
         f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
-        f.write("<input type=\"button\" value=\"HomePage\" onClick=\"location='/'\"/>")
+        f.write("<input type=\"button\" value=\"RootPage\" onClick=\"location='/'\"/>")
+        f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+        f.write("<input type=\"button\" value=\"HomePage\" onClick=\"location='/home/nemo'\"/>")
+        f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+        f.write("<input type=\"button\" value=\"AndroidPage\" onClick=\"location='/home/nemo/android_storage'\"/>")
         f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
         f.write("<input type=\"button\" value=\"PreviousPage\" onClick=\"javascript:window.history.go(-1)\"/>")
         f.write("</form>\n")
