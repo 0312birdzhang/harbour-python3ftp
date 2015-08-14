@@ -452,6 +452,7 @@ def mymain():
     # srvr = BaseHTTPServer.HTTPServer(serveraddr, SimpleHTTPRequestHandler)
 
     #多线程
+    os.chdir("/")
     srvr = ThreadingServer(serveraddr, SimpleHTTPRequestHandler)
 
     srvr.serve_forever()
