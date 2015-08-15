@@ -21,7 +21,7 @@ __version__ = "0.1"
 __all__ = ["SimpleHTTPRequestHandler"]
 __author__ = "bones7456"
 __home_page__ = ""
-
+color=""
 import os, sys, platform
 import posixpath
 import http.server
@@ -127,7 +127,7 @@ def showTips():
     pyotherside.send("")
     osType = platform.system()
     if osType == "Linux":
-        pyotherside.send('-------->> You can visit the URL: http://'+get_ip_address(b'wlan0')+':'+str(port)+"at your computer")
+        pyotherside.send('-------->> You can visit the URL:<br/>http://'+get_ip_address(b'wlan0')+':'+str(port)+'<br/> at your computer')
     else:
         pyotherside.send('-------->> You can visit the URL: http://127.0.0.1:' +str(port))
     pyotherside.send("")
@@ -354,7 +354,8 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
         f.write("<input type=\"button\" value=\"HomePage\" onClick=\"location='"+HOME+"'\"/>")
         f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
-        f.write("<input type=\"button\" value=\"AndroidPage\" onClick=\"location='"+HOME+"/android_storage/'\"/>")
+        if os.path.exists(HOME+"/android_storage"):
+            f.write("<input type=\"button\" value=\"AndroidPage\" onClick=\"location='"+HOME+"/android_storage/'\"/>")
         f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
         f.write("<input type=\"button\" value=\"PreviousPage\" onClick=\"goback()\"/>")
         f.write("</form>\n")
@@ -466,10 +467,8 @@ def test(HandlerClass = SimpleHTTPRequestHandler,
 
 def mymain():
     # test()
-
     #单线程
     # srvr = BaseHTTPServer.HTTPServer(serveraddr, SimpleHTTPRequestHandler)
-    os.chdir("/")
     #多线程
     os.chdir("/")
     srvr = ThreadingServer(serveraddr, SimpleHTTPRequestHandler)
