@@ -8,8 +8,13 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+
 * Sat Aug 15 2015 BirdZhang <0312birdzhang@gmail.com> 0.0.4-3
  -modify PreviousPage button
+ -add xgd path
+
+* Fri Aug 14 2015 BirdZhang <0312birdzhang@gmail.com> 0.0.4-2
+ -bug fix
 
 * Wed Aug 12 2015 BirdZhang <0312birdzhang@gmail.com> 0.0.4-1
  -change default path to root,add home,android path button
