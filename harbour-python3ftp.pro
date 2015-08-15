@@ -23,6 +23,7 @@ OTHER_FILES += qml/harbour-python3ftp.qml \
     rpm/harbour-python3ftp.yaml \
     translations/*.ts \
     qml/pages/simpleftp.py \
+    qml/pages/basedir.py \
     harbour-python3ftp.desktop \
     rpm/harbour-python3ftp.changes
 

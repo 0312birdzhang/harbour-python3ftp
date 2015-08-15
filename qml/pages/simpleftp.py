@@ -36,6 +36,7 @@ import time
 import pyotherside
 import socket
 import random
+from basedir import *
 
 try:
     from io import StringIO
@@ -323,8 +324,26 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         list.sort(key=lambda a: a.lower())
         f = StringIO()
         displaypath = cgi.escape(urllib.parse.unquote(self.path))
+        javasc="""<script>
+                function goback(){
+                  var currUrl=window.location.pathname;
+                  if(currUrl == "/"){
+                    //do nothing
+                    return "/"
+                  }else {
+                    //split("/")
+                    currUrl=currUrl.substring(0,currUrl.lastIndexOf("/"));
+                    currUrl=currUrl.substring(0,currUrl.lastIndexOf("/"));
+                    if("" == currUrl){
+                        currUrl ="/"
+                    }
+                    window.location.href = currUrl;
+                  }
+                }
+                </script>
+                """
         f.write('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">')
-        f.write("<html>\n<head>\n <meta charset=\"UTF-8\"> \n<title>Directory listing for %s</title>\n</head>" % displaypath)
+        f.write("<html>\n<head>\n <meta charset=\"UTF-8\"> \n<title>Directory listing for %s</title>\n %s</head>" % (displaypath,javasc))
         f.write("<body>\n<h2>Directory listing for %s</h2>\n" % displaypath)
         f.write("<hr>\n")
         f.write("<form ENCTYPE=\"multipart/form-data\" method=\"post\">")
@@ -333,11 +352,11 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
         f.write("<input type=\"button\" value=\"RootPage\" onClick=\"location='/'\"/>")
         f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
-        f.write("<input type=\"button\" value=\"HomePage\" onClick=\"location='/home/nemo'\"/>")
+        f.write("<input type=\"button\" value=\"HomePage\" onClick=\"location='"+HOME+"'\"/>")
         f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
-        f.write("<input type=\"button\" value=\"AndroidPage\" onClick=\"location='/home/nemo/android_storage'\"/>")
+        f.write("<input type=\"button\" value=\"AndroidPage\" onClick=\"location='"+HOME+"/android_storage/'\"/>")
         f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
-        f.write("<input type=\"button\" value=\"PreviousPage\" onClick=\"javascript:window.history.go(-1)\"/>")
+        f.write("<input type=\"button\" value=\"PreviousPage\" onClick=\"goback()\"/>")
         f.write("</form>\n")
         f.write("<hr>\n<ul>\n")
         for name in list:
@@ -450,7 +469,7 @@ def mymain():
 
     #单线程
     # srvr = BaseHTTPServer.HTTPServer(serveraddr, SimpleHTTPRequestHandler)
-
+    os.chdir("/")
     #多线程
     srvr = ThreadingServer(serveraddr, SimpleHTTPRequestHandler)
 
