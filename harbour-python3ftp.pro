@@ -24,7 +24,8 @@ OTHER_FILES += qml/harbour-python3ftp.qml \
     translations/*.ts \
     qml/pages/simpleftp.py \
     harbour-python3ftp.desktop \
-    rpm/harbour-python3ftp.changes
+    rpm/harbour-python3ftp.changes \
+    qml/pages/test.qml
 
 # to disable building translations every time, comment out the
 # following CONFIG line

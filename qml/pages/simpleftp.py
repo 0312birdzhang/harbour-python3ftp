@@ -27,7 +27,7 @@ import posixpath
 import http.server
 from socketserver import ThreadingMixIn
 import threading
-import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
+import urllib.request, urllib.parse, urllib.error, urllib.request
 import cgi
 import shutil
 import mimetypes
@@ -54,7 +54,7 @@ def get_ip_address(ifname):
             struct.pack(b'256s', ifname[:15])
         )[20:24])
     except:
-        return "You may not connected to wifi"
+        return "Exception"
 
 class GetWanIp:
     def getip(self):
@@ -109,6 +109,12 @@ def showTips():
     pyotherside.send("")
     pyotherside.send('-------->>Starting------------ ')
     pyotherside.send("")
+    localip = get_ip_address(b'wlan0')
+    if "Exception" == localip:
+        pyotherside.send("Something error:")
+        pyotherside.send("You Jolla is not connected to Wi-Fi.")
+        pyotherside.send("Will exit...")
+        exit(1)
     # try:
     #     port = int(sys.argv[1])
     # except Exception as e:
