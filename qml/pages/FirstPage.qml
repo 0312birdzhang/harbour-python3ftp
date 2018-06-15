@@ -80,6 +80,7 @@ Page {
                     right:parent.right
                     margins: Theme.paddingLarge
                 }
+                linkColor: Theme.highlightColor
             }
 
     }

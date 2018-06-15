@@ -113,9 +113,11 @@ def showTips():
     localip = get_ip_address(b'wlan0')
     if "Exception" == localip:
         pyotherside.send("Something error:")
-        pyotherside.send("You Jolla is not connected to Wi-Fi.")
-        pyotherside.send("Will exit...")
-        exit(1)
+        pyotherside.send("You device is not connected to Wi-Fi.")
+        pyotherside.send("")
+        pyotherside.send("Please connect to Wi-Fi and try again")
+        pyotherside.send('-------->>end------------ ')
+        return
     # try:
     #     port = int(sys.argv[1])
     # except Exception as e:
@@ -127,13 +129,13 @@ def showTips():
 
     if not 1024 < port < 65535:  port = 9898
     # serveraddr = ('', port)
-    pyotherside.send('-------->> Ftp Server started !')
+    pyotherside.send('-------->> Http Server started !')
     pyotherside.send("")
     pyotherside.send('-------->> Now, listening at port ' + str(port) + ' ...')
     pyotherside.send("")
     osType = platform.system()
     if osType == "Linux":
-        pyotherside.send('-------->> You can visit the URL:<br/>http://'+get_ip_address(b'wlan0')+':'+str(port)+'<br/> at your computer')
+        pyotherside.send('-------->> You can visit the URL:<br/>http://'+localip+':'+str(port)+'<br/> at your computer')
     else:
         pyotherside.send('-------->> You can visit the URL: http://127.0.0.1:' +str(port))
     pyotherside.send("")
@@ -153,7 +155,7 @@ def sizeof_fmt(num):
 def modification_date(filename):
     # t = os.path.getmtime(filename)
     # return datetime.datetime.fromtimestamp(t)
-    return time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(os.path.getmtime(filename)))
+    return time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(os.lstat(filename).st_mtime))
 
 class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
@@ -382,7 +384,7 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             filename = filename.encode('utf-8', 'surrogateescape')#.decode('ISO-8859-1')
             f.write('<table><tr><td width="60%%"><a href="%s">%s</a></td><td width="20%%">%s</td><td width="20%%">%s</td></tr>\n'
                     % (urllib.parse.quote(linkname), colorName,
-                        sizeof_fmt(os.path.getsize(filename)), modification_date(filename)))
+                        sizeof_fmt(os.lstat(filename).st_size), modification_date(filename)))
         f.write("</table>\n<hr>\n</body>\n</html>\n")
         length = f.tell()
         f.seek(0)

@@ -8,6 +8,9 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Fri Jan 29 2016 BirdZhang <0312birdzhang@gmail.com> 0.0.5-3
+ -fix bugs when get symbolic links
+
 * Fri Jan 29 2016 BirdZhang <0312birdzhang@gmail.com> 0.0.5-1
  -tips modify
 
