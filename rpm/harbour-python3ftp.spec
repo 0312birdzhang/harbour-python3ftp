@@ -13,8 +13,8 @@ Name:       harbour-python3ftp
 %{!?qtc_make:%define qtc_make make}
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    A ftp client by python3
-Version:    0.5
-Release:    3
+Version:    0.6
+Release:    1
 Group:      Qt/Qt
 License:    LICENSE
 URL:        http://example.org/
@@ -29,7 +29,7 @@ BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  desktop-file-utils
 
 %description
-Short description of my SailfishOS Application
+A simple http util for transfer files
 
 
 %prep

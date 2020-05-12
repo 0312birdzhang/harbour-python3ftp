@@ -28,7 +28,11 @@ import http.server
 from socketserver import ThreadingMixIn
 import threading
 import urllib.request, urllib.parse, urllib.error, urllib.request
-import cgi
+import platform
+if platform.python_version() >= "3.8.0":
+    import html as cgi
+else:
+    import cgi
 import shutil
 import mimetypes
 import re
