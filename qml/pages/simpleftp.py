@@ -116,12 +116,14 @@ def showTips():
     pyotherside.send("")
     localip = get_ip_address(b'wlan0')
     if "Exception" == localip:
-        pyotherside.send("Something error:")
-        pyotherside.send("You device is not connected to Wi-Fi.")
-        pyotherside.send("")
-        pyotherside.send("Please connect to Wi-Fi and try again")
-        pyotherside.send('-------->>end------------ ')
-        return
+        localip = get_ip_address(b'rndis0')
+        if "Exception" == localip:
+            pyotherside.send("Something error:")
+            pyotherside.send("You device is not connected to usb cable or WiFi.")
+            pyotherside.send("")
+            pyotherside.send("Please connect to usb cable or WiFi and try again")
+            pyotherside.send('-------->>end------------ ')
+            return
     # try:
     #     port = int(sys.argv[1])
     # except Exception as e:

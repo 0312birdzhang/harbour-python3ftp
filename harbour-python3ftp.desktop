@@ -5,3 +5,7 @@ Icon=harbour-python3ftp
 Exec=harbour-python3ftp
 Name=PyFTP
 
+[X-Sailjail]
+OrganizationName=club.sailfishos
+ApplicationName=python3ftp
+Permissions=Internet;MediaIndexing;UserDirs;PublicDir;

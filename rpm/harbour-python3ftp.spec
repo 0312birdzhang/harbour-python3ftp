@@ -13,7 +13,7 @@ Name:       harbour-python3ftp
 %{!?qtc_make:%define qtc_make make}
 %{?qtc_builddir:%define _builddir %qtc_builddir}
 Summary:    A ftp client by python3
-Version:    0.6
+Version:    0.7
 Release:    1
 Group:      Qt/Qt
 License:    LICENSE
