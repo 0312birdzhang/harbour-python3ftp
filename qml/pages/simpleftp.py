@@ -27,12 +27,8 @@ import posixpath
 import http.server
 from socketserver import ThreadingMixIn
 import threading
-import urllib.request, urllib.parse, urllib.error, urllib.request
-import platform
-if platform.python_version() >= "3.8.0":
-    import html as cgi
-else:
-    import cgi
+import urllib.request, urllib.parse, urllib.error
+import html
 import shutil
 import mimetypes
 import re
@@ -42,10 +38,7 @@ import socket
 import random
 from basedir import *
 
-try:
-    from io import StringIO
-except ImportError:
-    from io import StringIO
+from io import StringIO
 
 def get_ip_address(ifname):
     import socket
@@ -87,7 +80,7 @@ class GetWanIp:
         opener = urllib.request.urlopen(url, None, 3)
         if url == opener.geturl():
             str = opener.read()
-        return re.search('(\d+\.){3}\d+',str).group(0)
+        return re.search(r'(\d+\.){3}\d+', str).group(0)
 def scan(port):
     sk = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sk.settimeout(3)
@@ -203,18 +196,30 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         r, info = self.deal_post_data()
         print(r, info, "by: ", self.client_address)
         f = StringIO()
-        f.write('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">')
-        f.write("<html>\n<title>Upload Result Page</title>\n")
-        f.write("<body>\n<h2>Upload Result Page</h2>\n")
-        f.write("<hr>\n")
+        result_css = """<style>
+            body { font-family: "Helvetica Neue", Arial, sans-serif; margin: 0; background: #f4f6f8; color: #333; }
+            .container { max-width: 500px; margin: 40px auto; background: #fff; border: 1px solid #e0e4e8; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: hidden; text-align: center; }
+            .header { padding: 20px; color: #fff; }
+            .header.success { background: #43a047; }
+            .header.failed { background: #e53935; }
+            .header h1 { margin: 0; font-size: 20px; }
+            .body { padding: 24px 20px; font-size: 14px; word-break: break-all; }
+            .btn { display: inline-block; margin-top: 8px; padding: 8px 18px; font-size: 13px; border: 1px solid #cfd8dc; border-radius: 4px; background: #fff; color: #37474f; cursor: pointer; text-decoration: none; }
+            .btn:hover { background: #eceff1; }
+            .footer { padding: 12px 20px; font-size: 12px; color: #90a4ae; }
+            </style>"""
+        f.write("<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n")
+        f.write("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n")
+        f.write("<title>Upload Result Page</title>\n" + result_css + "\n</head>\n")
+        f.write("<body>\n<div class=\"container\">\n")
         if r:
-            f.write("<strong>Success:</strong>")
+            f.write("<div class=\"header success\"><h1>Upload Success</h1></div>\n")
         else:
-            f.write("<strong>Failed:</strong>")
-        f.write(info)
-        f.write("<br><a href=\"%s\">back</a>" % self.headers['referer'])
-        f.write("<hr><small>Powered By: bones7456, Ported By:0312birdzhang ")
-        f.write("here</a>.</small></body>\n</html>\n")
+            f.write("<div class=\"header failed\"><h1>Upload Failed</h1></div>\n")
+        f.write("<div class=\"body\">" + html.escape(str(info)) + "</div>\n")
+        f.write("<a class=\"btn\" href=\"%s\">Back</a>\n" % self.headers['referer'])
+        f.write("<div class=\"footer\">Powered By: bones7456, Ported By: 0312birdzhang</div>\n")
+        f.write("</div>\n</body>\n</html>\n")
         length = f.tell()
         f.seek(0)
         self.send_response(200)
@@ -337,61 +342,85 @@ class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             return None
         list.sort(key=lambda a: a.lower())
         f = StringIO()
-        displaypath = cgi.escape(urllib.parse.unquote(self.path))
-        javasc="""<script>
-                function goback(){
-                  var currUrl=window.location.pathname;
-                  if(currUrl == "/"){
-                    //do nothing
-                    return "/"
-                  }else {
-                    //split("/")
-                    currUrl=currUrl.substring(0,currUrl.lastIndexOf("/"));
-                    currUrl=currUrl.substring(0,currUrl.lastIndexOf("/"));
-                    if("" == currUrl){
-                        currUrl ="/"
-                    }
-                    window.location.href = currUrl;
-                  }
+        displaypath = html.escape(urllib.parse.unquote(self.path))
+        css = """<style>
+            body { font-family: "Helvetica Neue", Arial, sans-serif; margin: 0; background: #f4f6f8; color: #333; }
+            .container { max-width: 800px; margin: 20px auto; background: #fff; border: 1px solid #e0e4e8; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: hidden; }
+            .header { background: #2c3e50; color: #fff; padding: 14px 20px; }
+            .header h1 { margin: 0; font-size: 20px; }
+            .header .path { margin-top: 4px; font-size: 13px; color: #bdc3c7; word-break: break-all; }
+            .toolbar { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 20px; background: #fafbfc; border-bottom: 1px solid #e0e4e8; align-items: center; }
+            .toolbar input[type="file"] { font-size: 13px; }
+            .btn { display: inline-block; padding: 6px 14px; font-size: 13px; border: 1px solid #cfd8dc; border-radius: 4px; background: #fff; color: #37474f; cursor: pointer; text-decoration: none; }
+            .btn:hover { background: #eceff1; }
+            .btn.upload { background: #1976d2; border-color: #1976d2; color: #fff; }
+            .btn.upload:hover { background: #1565c0; }
+            table { width: 100%; border-collapse: collapse; }
+            th { background: #eceff1; text-align: left; padding: 10px 16px; font-size: 13px; color: #546e7a; border-bottom: 1px solid #e0e4e8; }
+            td { padding: 9px 16px; font-size: 14px; border-bottom: 1px solid #f0f2f4; }
+            tr:hover td { background: #f7fafc; }
+            td.name a { color: #1976d2; text-decoration: none; font-weight: 500; }
+            td.name a:hover { text-decoration: underline; }
+            td.name .dir { color: #43a047; }
+            td.name .link { color: #ab47bc; }
+            td.size, td.time { color: #78909c; }
+            .footer { padding: 12px 20px; font-size: 12px; color: #90a4ae; text-align: center; }
+            </style>"""
+        javasc = """<script>
+            function goback(){
+              var currUrl=window.location.pathname;
+              if(currUrl == "/"){
+                return "/"
+              }else {
+                currUrl=currUrl.substring(0,currUrl.lastIndexOf("/"));
+                currUrl=currUrl.substring(0,currUrl.lastIndexOf("/"));
+                if("" == currUrl){
+                    currUrl ="/"
                 }
-                </script>
-                """
-        f.write('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">')
-        f.write("<html>\n<head>\n <meta charset=\"UTF-8\"> \n<title>Directory listing for %s</title>\n %s</head>" % (displaypath,javasc))
-        f.write("<body>\n<h2>Directory listing for %s</h2>\n" % displaypath)
-        f.write("<hr>\n")
-        f.write("<form ENCTYPE=\"multipart/form-data\" method=\"post\">")
-        f.write("<input name=\"file\" type=\"file\"/>")
-        f.write("<input type=\"submit\" value=\"upload\"/>")
-        f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
-        f.write("<input type=\"button\" value=\"RootPage\" onClick=\"location='/'\"/>")
-        f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
-        f.write("<input type=\"button\" value=\"HomePage\" onClick=\"location='"+HOME+"'\"/>")
-        f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
-        if os.path.exists(HOME+"/android_storage"):
-            f.write("<input type=\"button\" value=\"AndroidPage\" onClick=\"location='"+HOME+"/android_storage/'\"/>")
-        f.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
-        f.write("<input type=\"button\" value=\"PreviousPage\" onClick=\"goback()\"/>")
+                window.location.href = currUrl;
+              }
+            }
+            </script>"""
+        f.write("<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n")
+        f.write("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n")
+        f.write("<title>Directory listing for %s</title>\n" % displaypath)
+        f.write(css + "\n" + javasc + "\n</head>\n")
+        f.write("<body>\n<div class=\"container\">\n")
+        f.write("<div class=\"header\"><h1>Directory listing</h1><div class=\"path\">%s</div></div>\n" % displaypath)
+        f.write("<div class=\"toolbar\">\n")
+        f.write("<form action=\"\" method=\"post\" enctype=\"multipart/form-data\" style=\"display:inline\">")
+        f.write("<input type=\"file\" name=\"file\"/> ")
+        f.write("<input type=\"submit\" value=\"Upload\" class=\"btn upload\"/>")
         f.write("</form>\n")
-        f.write("<hr>\n<ul>\n")
+        f.write("<a class=\"btn\" href=\"/\">RootPage</a>\n")
+        f.write("<a class=\"btn\" href=\"" + HOME + "\">HomePage</a>\n")
+        if os.path.exists(HOME+"/android_storage"):
+            f.write("<a class=\"btn\" href=\"" + HOME + "/android_storage/\">AndroidPage</a>\n")
+        f.write("<a class=\"btn\" href=\"#\" onClick=\"goback();return false;\">PreviousPage</a>\n")
+        f.write("</div>\n")
+        f.write("<table>\n")
+        f.write("<tr><th>Filename</th><th>Filesize</th><th>CreateTime</th></tr>\n")
+        f.write('<tr><td class="name"><a class="dir" href="../">../</a></td><td class="size"></td><td class="time"></td></tr>\n')
         for name in list:
             fullname = os.path.join(path, name)
-            colorName = displayname = linkname = name
-            # Append / for directories or @ for symbolic links
+            displayname = linkname = name
+            cssClass = ""
             if os.path.isdir(fullname):
-                colorName = '<span style="background-color: #CEFFCE;">' + name + '/</span>'
-                displayname = name
+                cssClass = ' dir'
+                displayname = name + "/"
                 linkname = name + "/"
             if os.path.islink(fullname):
-                colorName = '<span style="background-color: #FFBFFF;">' + name + '@</span>'
-            linkname = linkname.encode('utf-8', 'surrogateescape')#.decode('ISO-8859-1')
-                # Note: a link to a directory displays with @ and links with /
-            filename = os.getcwd() + '/' + displaypath + displayname
-            filename = filename.encode('utf-8', 'surrogateescape')#.decode('ISO-8859-1')
-            f.write('<table><tr><td width="60%%"><a href="%s">%s</a></td><td width="20%%">%s</td><td width="20%%">%s</td></tr>\n'
-                    % (urllib.parse.quote(linkname), colorName,
+                cssClass = ' link'
+                displayname = name + "@"
+            linkname = linkname.encode('utf-8', 'surrogateescape')
+            filename = os.getcwd() + '/' + displaypath + name
+            filename = filename.encode('utf-8', 'surrogateescape')
+            f.write('<tr><td class="name"><a class="%s" href="%s">%s</a></td><td class="size">%s</td><td class="time">%s</td></tr>\n'
+                    % (cssClass.strip(), urllib.parse.quote(linkname), html.escape(displayname),
                         sizeof_fmt(os.lstat(filename).st_size), modification_date(filename)))
-        f.write("</table>\n<hr>\n</body>\n</html>\n")
+        f.write("</table>\n")
+        f.write("<div class=\"footer\">Powered By: bones7456, Ported By: 0312birdzhang</div>\n")
+        f.write("</div>\n</body>\n</html>\n")
         length = f.tell()
         f.seek(0)
         self.send_response(200)
