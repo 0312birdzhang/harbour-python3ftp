@@ -32,6 +32,8 @@
 #include <QtQuick>
 #endif
 
+#include <QQuickView>
+#include <QGuiApplication>
 #include <sailfishapp.h>
 
 
