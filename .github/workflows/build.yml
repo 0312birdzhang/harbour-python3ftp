@@ -1,0 +1,53 @@
+## Use Github Actions to build sailfishos rpms
+## Copy from https://github.com/CODeRUS/screencast
+## Thanks CODeRUS
+
+name: CI
+
+on:
+  push:
+    tags:
+      - '*'
+
+env:
+  RELEASE: 5.0.0.43
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Prepare
+      run: mkdir -p output && chmod 777 output
+
+    - name: Build armv7hl
+      run: docker run --rm --privileged -v $PWD:/share coderus/sailfishos-platform-sdk-armv7hl:$RELEASE /bin/bash -c "
+            mkdir -p build ;
+            cd build ;
+            cp -r /share/* . ;
+            mb2 -t SailfishOS-$RELEASE-armv7hl build ;
+            cp -r RPMS/*.rpm /share/output"
+
+    - name: Build i486
+      run: docker run --rm --privileged -v $PWD:/share coderus/sailfishos-platform-sdk-i486:$RELEASE /bin/bash -c "
+            mkdir -p build ;
+            cd build ;
+            cp -r /share/* . ;
+            mb2 -t SailfishOS-$RELEASE-i486 build ;
+            cp -r RPMS/*.rpm /share/output"
+
+    - name: Build aarch64
+      run: docker run --rm --privileged -v $PWD:/share coderus/sailfishos-platform-sdk-aarch64:$RELEASE /bin/bash -c "
+            mkdir -p build ;
+            cd build ;
+            cp -r /share/* . ;
+            mb2 -t SailfishOS-$RELEASE-aarch64 build ;
+            cp -r RPMS/*.rpm /share/output"
+    - name: Upload build result
+      uses: actions/upload-artifact@v4
+      with:
+        name: harbour-python3ftp-rpms.zip
+        path: output
